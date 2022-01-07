@@ -1,0 +1,29 @@
+PODS:
+  - FMDB (2.7.5):
+    - FMDB/standard (= 2.7.5)
+  - FMDB/standard (2.7.5)
+  - ObjectMapper (4.2.0)
+  - Worm (0.1.0):
+    - FMDB
+    - ObjectMapper
+
+DEPENDENCIES:
+  - Worm (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - FMDB
+    - ObjectMapper
+
+EXTERNAL SOURCES:
+  Worm:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  ObjectMapper: 1eb41f610210777375fa806bf161dc39fb832b81
+  Worm: d1315878cce08fd99cb1468812855b9ed8ef1171
+
+PODFILE CHECKSUM: 3c66ada60bf0187acc0eee00b10de934faf53df9
+
+COCOAPODS: 1.10.1

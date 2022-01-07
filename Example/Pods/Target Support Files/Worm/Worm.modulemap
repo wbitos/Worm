@@ -1,0 +1,6 @@
+framework module Worm {
+  umbrella header "Worm-umbrella.h"
+
+  export *
+  module * { export * }
+}

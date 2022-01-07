@@ -1,0 +1,6 @@
+framework module Pods_Worm_Example {
+  umbrella header "Pods-Worm_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}

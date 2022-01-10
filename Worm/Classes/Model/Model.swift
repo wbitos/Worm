@@ -70,72 +70,26 @@ open class Model: NSObject, Mappable, ModelProtocol {
     
     @discardableResult
     open func insert() -> Bool {
-        var map = self.toJSON()
-        map.removeValue(forKey: "id")
-        
-        let filtered = map.keys.filter { (name) -> Bool in
-            return name != "id"
-        }
-        
-        let names = filtered.map { (name) -> String in
-            return "`\(name)`"
-        }
-        let flags = filtered.map { (name) -> String in
-            return ":\(name)"
-        }
-        
-        let sql = "insert into \(self.table()) (\(names.joined(separator: ","))) values (\(flags.joined(separator: ",")))"
-        
-        NSLog("excute: \(sql)")
-        
-        var isSuccess = false
-        var lastInsertRowId: Int64 = 0
-        self.inTransaction { (db, rollback) in
-            isSuccess = db.executeUpdate(sql, withParameterDictionary: map)
-            lastInsertRowId = db.lastInsertRowId
-        }
-        self.id = lastInsertRowId
-        return isSuccess
+        let query = DBQuery()
+        query.table = self.table()
+        query.connection = self.connect()
+        return query.update().insert(model: self)
     }
     
     @discardableResult
     open func replace() -> Bool {
-        let map = self.toJSON()
-        
-        let names = map.keys.map { (name) -> String in
-            return "`\(name)`"
-        }
-        let flags = map.keys.map { (name) -> String in
-            return ":\(name)"
-        }
-        let sql = "insert or replace into \(self.table()) (\(names.joined(separator: ","))) values (\(flags.joined(separator: ",")))"
-        
-        NSLog("excute: \(sql)")
-        var isSuccess = false
-        self.inTransaction { (db, rollback) in
-            isSuccess = db.executeUpdate(sql, withParameterDictionary: map)
-        }
-        return isSuccess
+        let query = DBQuery()
+        query.table = self.table()
+        query.connection = self.connect()
+        return query.update().replace(model: self)
     }
     
     @discardableResult
     open func update() -> Bool {
-        let map = self.toJSON()
-        
-        let flags = map.keys.filter { (name) -> Bool in
-                return name != "id"
-            }.map { (name) -> String in
-            return "`\(name)` = :\(name)"
-        }
-        let sql = "update \(self.table()) set \(flags.joined(separator: ",")) where id=:id"
-        
-        NSLog("excute: \(sql) values: \(self.toJSONString() ?? "")")
-        
-        var isSuccess = false
-        self.inTransaction { (db, rollback) in
-            isSuccess = db.executeUpdate(sql, withParameterDictionary: map)
-        }
-        return isSuccess
+        let query = DBQuery()
+        query.table = self.table()
+        query.connection = self.connect()
+        return query.update().update(model: self)
     }
     
     @discardableResult
@@ -200,56 +154,46 @@ open class Model: NSObject, Mappable, ModelProtocol {
         return query.orderby("updated_at", sequence: .desc).take(1).select().first()
     }
     
+    open class func all<T: Mappable>(complete: Closures.Action<[T]>? = nil) {
+        let query = DBQuery()
+        query.table = self.table()
+        query.connection = self.connect()
+        query.select().get(complete: complete)
+    }
+    
+    open class func latest<T: Mappable>(_ count: Int64, complete: Closures.Action<[T]>? = nil) {
+        let query = DBQuery()
+        query.table = self.table()
+        query.connection = self.connect()
+        query.orderby("updated_at", sequence: .desc).take(count).select().get(complete: complete)
+    }
+    
+    open class func latest<T: Mappable>(complete: Closures.Action<T?>? = nil) {
+        let query = DBQuery()
+        query.table = self.table()
+        query.connection = self.connect()
+        query.orderby("updated_at", sequence: .desc).take(1).select().first(complete: complete)
+    }
+    
     open func insert(db: FMDatabase) -> Bool {
-        let map = self.toJSON()
-        
-        let filtered = map.keys.filter { (name) -> Bool in
-            return name != "id"
-        }
-        
-        let names = filtered.map { (name) -> String in
-            return "`\(name)`"
-        }
-        let flags = filtered.map { (name) -> String in
-            return ":\(name)"
-        }
-        
-        let sql = "insert into \(self.table()) (\(names.joined(separator: ","))) values (\(flags.joined(separator: ",")))"
-        
-        NSLog("excute: \(sql)")
-        let isSuccess = db.executeUpdate(sql, withParameterDictionary: map)
-        return isSuccess
+        let query = DBQuery()
+        query.table = self.table()
+        query.connection = self.connect()
+        return query.update().insert(db: db, model: self)
     }
     
     open func replace(db: FMDatabase) -> Bool {
-        let map = self.toJSON()
-        
-        let names = map.keys.map { (name) -> String in
-            return "`\(name)`"
-        }
-        let flags = map.keys.map { (name) -> String in
-            return ":\(name)"
-        }
-        let sql = "insert or replace into \(self.table()) (\(names.joined(separator: ","))) values (\(flags.joined(separator: ",")))"
-        
-        NSLog("excute: \(sql)")
-        let isSuccess = db.executeUpdate(sql, withParameterDictionary: map)
-        return isSuccess
+        let query = DBQuery()
+        query.table = self.table()
+        query.connection = self.connect()
+        return query.update().replace(db: db, model: self)
     }
     
     open func update(db: FMDatabase) -> Bool {
-        let map = self.toJSON()
-        
-        let flags = map.keys.filter { (name) -> Bool in
-            return name != "id"
-            }.map { (name) -> String in
-                return "`\(name)` = :\(name)"
-        }
-        let sql = "update \(self.table()) set \(flags.joined(separator: ",")) where id=:id"
-        
-        NSLog("excute: \(sql) values: \(self.toJSONString() ?? "")")
-        let isSuccess = db.executeUpdate(sql, withParameterDictionary: map)
-        return isSuccess
+        let query = DBQuery()
+        query.table = self.table()
+        query.connection = self.connect()
+        return query.update().update(db: db, model: self)
     }
     
     open func save(db: FMDatabase) -> Bool {

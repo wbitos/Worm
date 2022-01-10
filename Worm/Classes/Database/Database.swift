@@ -10,6 +10,8 @@ import UIKit
 import FMDB
 
 open class Database: NSObject {
+    static var queue: DispatchQueue = DispatchQueue.init(label: "com.worm.db.excution.pool")
+
     var path: String
     
     public init(dbPath: String) {
@@ -18,9 +20,7 @@ open class Database: NSObject {
         self.connect(dbPath: dbPath)
     }
     
-    open var table:String? = nil
     open var connection: FMDatabaseQueue? = nil
-    open var query: DBQuery = DBQuery()
     
     @discardableResult
     open func connect(dbPath: String) -> Self {
@@ -32,43 +32,4 @@ open class Database: NSObject {
         let query = DBQuery().table(table)
         return query
     }
-    
-    
-//
-//    open func table(_ name: String) -> Self {
-//        self.table = name
-//        return self
-//    }
-//    
-//    open func whereIn(key: String, values: [Any]) -> Self {
-//        return self
-//    }
-//    
-//    open func whereEqual(key: String, value: Any) -> Self {
-//        return self
-//    }
-//    
-//    open func whereGreater(key: String, value: Any) -> Self {
-//        return self
-//    }
-//    
-//    open func whereLesser(key: String, value: Any) -> Self {
-//        return self
-//    }
-//    
-//    open func whereQuery(query: ((DBQuery) -> Void)) -> Self {
-//        return self
-//    }
-//    
-//    open func get<T>() -> [T] {
-//        return []
-//    }
-//    
-//    open func get<T>(columbs: [String]) -> [T] {
-//        return []
-//    }
-//    
-//    open func first<T>() -> T? {
-//        return nil
-//    }
 }

@@ -15,6 +15,7 @@ open class Closures: NSObject {
     public typealias Custom<T, R> = (T) -> R
     public typealias UserInfo<T> = (T, [AnyHashable: Any]?) -> Void
     
+    public typealias ActionSenderObject<S, O> = (S, O) -> Void
     public typealias ActionCallback<T, E> = (T, Closures.Action<E>?) -> Void
 
 }
